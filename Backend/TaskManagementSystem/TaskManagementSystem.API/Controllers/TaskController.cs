@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Data;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using TaskManagement.API.Data;
 using TaskManagement.API.DTOs;
@@ -12,7 +14,7 @@ namespace TaskManagement.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    //[Authorize]
+    [Authorize]
    public class TasksController : ControllerBase
    {
        private readonly ApplicationDbContext _context;
@@ -24,7 +26,7 @@ namespace TaskManagement.API.Controllers
 
 
         [HttpPost]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, SuperAdmin")]
         public async Task<IActionResult> AddTask([FromBody] CreateTaskDto dto)
         {
             
@@ -76,7 +78,7 @@ namespace TaskManagement.API.Controllers
         }
 
         [HttpGet]
-        //[Authorize(Roles = "SuperAdmin,Admin")]
+        [Authorize(Roles = "SuperAdmin,Admin")]
         public async Task<IActionResult> GetAll()
         {
            var tasks = await _context.Tasks
@@ -106,7 +108,7 @@ namespace TaskManagement.API.Controllers
 
 
         [HttpDelete("{id}")]
-        //[Authorize(Roles ="SuperAdmin")]
+        [Authorize(Roles ="SuperAdmin")]
         public async Task<IActionResult> DeleteTask(int id)
         {
             var task = await _context.Tasks.FindAsync(id);
@@ -120,7 +122,7 @@ namespace TaskManagement.API.Controllers
         }
 
         [HttpGet("search")]
-        //[Authorize(Roles = "SuperAdmin,Admin")]
+        [Authorize(Roles = "SuperAdmin,Admin")]
         public async Task<IActionResult> SearchTaskByTitle([FromQuery] string title)
         {
             if (string.IsNullOrWhiteSpace(title))
@@ -158,8 +160,10 @@ namespace TaskManagement.API.Controllers
 
             return Ok(tasks);
         }
+
+
         [HttpPut("{id}")]
-        //[Authorize(Roles = "SuperAdmin")]
+        [Authorize(Roles = "SuperAdmin")]
         public async Task<IActionResult> UpdateTask(int id, [FromBody] UpdateTaskDto dto)
         {
             if (!ModelState.IsValid)
@@ -220,184 +224,51 @@ namespace TaskManagement.API.Controllers
             });
         }
 
+        [HttpGet("GetAllTasksDetailsFromSP")]
+        [Authorize(Roles ="Admin, SuperAdmin")]
+        public async Task<IActionResult> GetAllTasksDetailsFromSP()
+        {
+            var taskDetails = new List<TaskDetailDto>();
+            // Get connection string to database 
+            var connectionString = _context.Database.GetDbConnection().ConnectionString;
 
-        // [HttpPut("{id}")]
-        // //[Authorize(Roles = "Admin")]
-        // public async Task<IActionResult> UpdateTask(int id, [FromBody] UpdateTaskDto dto)
-        // {
-        //     // update only the Sent Property from request
-        //     if (!ModelState.IsValid)
-        //         return BadRequest(ModelState);
-        //
-        //     var task = await _context.Tasks
-        //         .Include(t => t.AssignedUsers)
-        //         .FirstOrDefaultAsync(t => t.Id == id);
-        //
-        //     if (task == null)
-        //         return NotFound("Task not found");
-        //
-        //     if (!string.IsNullOrWhiteSpace(dto.Title))
-        //         task.Title = dto.Title;
-        //
-        //     
-        //     if (dto.Description != null)
-        //         task.Description = dto.Description;
-        //
-        //     if (dto.Status.HasValue)
-        //     {
-        //         if (!Enum.IsDefined(typeof(Status), dto.Status.Value))
-        //             return BadRequest("Invalid status value");
-        //
-        //         task.Status = (Status)dto.Status.Value;
-        //     }
-        //
-        //     if (dto.DaysChange.HasValue)
-        //     {
-        //         var baseDate = task.DueDate ?? task.CreatedDate;
-        //         var newDueDate = baseDate.AddDays(dto.DaysChange.Value);
-        //
-        //         if (newDueDate < task.CreatedDate)
-        //             return BadRequest("DueDate cannot be before CreatedDate");
-        //
-        //         task.DueDate = newDueDate;
-        //     }
-        //
-        //     
-        //     if (dto.AssignedUserIds != null)
-        //     {
-        //         if (dto.AssignedUserIds.Any())
-        //         {
-        //             var users = await _context.Users
-        //                 .Where(u => dto.AssignedUserIds.Contains(u.Id))
-        //                 .ToListAsync();
-        //
-        //             if (users.Count != dto.AssignedUserIds.Count)
-        //                 return BadRequest("One or more assigned users do not exist");
-        //
-        //             task.AssignedUsers.Clear();
-        //             task.AssignedUsers = users;
-        //         }
-        //         else
-        //         {
-        //             
-        //             task.AssignedUsers.Clear();
-        //         }
-        //     }
-        //    
-        //
-        //     await _context.SaveChangesAsync();
-        //
-        //    
-        //     var result = new TaskResponseDto
-        //     {
-        //         Id = task.Id,
-        //         Title = task.Title,
-        //         Description = task.Description,
-        //         Status = task.Status.ToString(),
-        //         CreatedDate = task.CreatedDate,
-        //         DueDate = task.DueDate,
-        //         AssignedTo = task.AssignedUsers.Select(u => u.UserName).ToList()
-        //     };
-        //
-        //     return Ok(new { message = "Task updated successfully", task = result });
-        // }
-        //
-        // [HttpDelete("{id}")]
-        // //[Authorize(Roles = "Admin")]
-        // public async Task<IActionResult> DeleteTask(int id)
-        // {
-        //     var task = await _context.Tasks.FindAsync(id);
-        //     if (task == null) 
-        //         return NotFound(new { message = "Task not found" });
-        //
-        //     _context.Tasks.Remove(task);
-        //     await _context.SaveChangesAsync();
-        //
-        //     return Ok(new { message = "Task deleted successfully" });
-        // }
-        //
-        // [HttpPost("{taskId}/add-users")]
-        // //[Authorize(Roles = "Admin")]
-        // public async Task<IActionResult> AddUsersToTask(int taskId, [FromBody] List<int> userIds)
-        // {
-        //     if (userIds == null || !userIds.Any())
-        //         return BadRequest("User IDs cannot be empty");
-        //
-        //     var task = await _context.Tasks
-        //         .Include(t => t.AssignedUsers)
-        //         .FirstOrDefaultAsync(t => t.Id == taskId);
-        //
-        //     if (task == null)
-        //         return NotFound(new { message = "Task not found" });
-        //
-        //     var users = await _context.Users
-        //         .Where(u => userIds.Contains(u.Id))
-        //         .ToListAsync();
-        //
-        //     if (users.Count != userIds.Count)
-        //         return BadRequest("One or more users do not exist");
-        //
-        //     foreach (var user in users)
-        //     {
-        //         if (!task.AssignedUsers.Any(u => u.Id == user.Id))
-        //             task.AssignedUsers.Add(user);
-        //     }
-        //
-        //     await _context.SaveChangesAsync();
-        //
-        //     // Convert to DTO to avoid cycles
-        //     var result = new TaskResponseDto
-        //     {
-        //         Id = task.Id,
-        //         Title = task.Title,
-        //         Description = task.Description,
-        //         Status = task.Status.ToString(),
-        //         CreatedDate = task.CreatedDate,
-        //         DueDate = task.DueDate,
-        //         AssignedTo = task.AssignedUsers.Select(u => u.UserName).ToList()
-        //     };
-        //
-        //     return Ok(new { message = "Users added to task successfully", task = result });
-        // }
-        //
-        // [HttpPost("{taskId}/remove-users")]
-        // //[Authorize(Roles = "Admin")]
-        // public async Task<IActionResult> RemoveUsersFromTask(int taskId, [FromBody] List<int> userIds)
-        // {
-        //     if (userIds == null || !userIds.Any())
-        //         return BadRequest("User IDs cannot be empty");
-        //
-        //     var task = await _context.Tasks
-        //         .Include(t => t.AssignedUsers)
-        //         .FirstOrDefaultAsync(t => t.Id == taskId);
-        //
-        //     if (task == null)
-        //         return NotFound(new { message = "Task not found" });
-        //
-        //     foreach (var userId in userIds)
-        //     {
-        //         var user = task.AssignedUsers.FirstOrDefault(u => u.Id == userId);
-        //         if (user == null)
-        //             return BadRequest($"User with Id {userId} is not assigned to this task");
-        //
-        //         task.AssignedUsers.Remove(user);
-        //     }
-        //
-        //     await _context.SaveChangesAsync();
-        //
-        //     // Convert to DTO to avoid cycles
-        //     var result = new TaskResponseDto
-        //     {
-        //         Id = task.Id,
-        //         Title = task.Title,
-        //         Description = task.Description,
-        //         Status = task.Status.ToString(),
-        //         CreatedDate = task.CreatedDate,
-        //         DueDate = task.DueDate,
-        //         AssignedTo = task.AssignedUsers.Select(u => u.UserName).ToList()
-        //     };
-        //
-        //     return Ok(new { message = "Users removed from task successfully", task = result });
-        // }
-    }
+            using (var connection = new SqlConnection(connectionString))
+            {
+                using(var command = new SqlCommand("GetAllTasksDetails", connection))
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+                    await connection.OpenAsync();
+
+                    using (var reader = await command.ExecuteReaderAsync()) 
+                    { 
+                        while (await reader.ReadAsync()) 
+                        {
+                            taskDetails.Add(new TaskDetailDto
+                            {
+                                UserName = reader["UserName"]?.ToString(),
+                                Title = reader["Title"]?.ToString(),
+                                Description = reader["Description"]?.ToString(),
+                                CreatedDate = reader["CreatedDate"] as DateTime?,
+                                DueDate = reader["DueDate"] as DateTime?,
+                                ClosedDate = reader["ClosedDate"] as DateTime?,
+                                TaskStatus = reader["TaskStatus"]?.ToString(),
+                                CreatedByName = reader["CreatedByName"]?.ToString(),
+                                FeedBack = reader["FeedBack"]?.ToString(),
+                                UserTaskStatus = reader["UserTaskStatus"]?.ToString(),
+                                AssignedDate = reader["AssignedDate"] as DateTime?,
+                                UserTaskDueDate = reader["UserDueDate"] as DateTime?,
+                                UserTaskClosedDate = reader["UserClosedDate"] as DateTime?
+                            });
+                        
+                        }
+                    }
+                }
+            }
+
+
+            return Ok(taskDetails);
+        }
+
+
+   }
 }

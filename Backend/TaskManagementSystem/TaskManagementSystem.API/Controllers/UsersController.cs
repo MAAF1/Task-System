@@ -11,7 +11,7 @@ namespace TaskManagement.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    // [Authorize(Roles = "SuperAdmin")]
+    [Authorize]
 
     public class UsersController : ControllerBase
     {
@@ -25,6 +25,7 @@ namespace TaskManagement.API.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllUsers()
         {
             var users = await _context.Users
@@ -40,6 +41,7 @@ namespace TaskManagement.API.Controllers
             return Ok(users);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet("search")]
         public async Task<IActionResult> SearchUsers([FromQuery] string name)
         {

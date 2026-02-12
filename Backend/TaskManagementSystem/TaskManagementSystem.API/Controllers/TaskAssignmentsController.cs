@@ -10,7 +10,7 @@ namespace TaskManagement.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize]
+    [Authorize(Roles = "SuperAdmin")]
     public class TaskAssignmentsController : ControllerBase
     {
         private readonly ApplicationDbContext _context;

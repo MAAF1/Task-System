@@ -23,7 +23,7 @@ namespace TaskManagement.API.Controllers
             _context = context;
         }
 
-        //[Authorize(Roles ="User")]
+        
         [HttpGet("my")]
         
         public async Task<IActionResult> GetMyTasks()
@@ -93,28 +93,14 @@ namespace TaskManagement.API.Controllers
             userTask.Status = Status.Completed;
             userTask.ClosedDate = DateTime.UtcNow;
 
-            
-            if (!string.IsNullOrWhiteSpace(dto.Feedback))
-                userTask.Feedback = dto.Feedback;
+     
 
             await _context.SaveChangesAsync();
 
             
-            var response = new
-            {
-                message = "Task completed successfully",
-                task = new
-                {
-                    TaskId = userTask.TaskId,
-                    Status = userTask.Status,
-                    Feedback = userTask.Feedback,
-                    AssignedDate = userTask.AssignedDate,
-                    ClosedDate = userTask.ClosedDate,
-                    DueDate = userTask.DueDate
-                }
-            };
+          
 
-            return Ok(response);
+            return Ok("Task completed successfully");
         }
 
         [HttpPut("{taskId}/feedback")]
