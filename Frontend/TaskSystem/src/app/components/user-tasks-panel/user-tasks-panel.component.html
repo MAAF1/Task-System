@@ -1,0 +1,33 @@
+<section class="panel">
+  <h2>My assigned tasks (User view)</h2>
+  <div class="task-list" *ngIf="tasks.length; else noMyTasks">
+    <article class="task-card compact" *ngFor="let task of tasks">
+      <div class="task-head">
+        <h3>{{ task.title }}</h3>
+        <span class="chip">{{ task.userStatus }}</span>
+      </div>
+      <p *ngIf="task.description">{{ task.description }}</p>
+      <div class="meta">
+        <span>Assigned: {{ task.userAssignedDate | date: 'mediumDate' }}</span>
+        <span *ngIf="task.taskDueDate">Due: {{ task.taskDueDate | date: 'mediumDate' }}</span>
+      </div>
+
+      <label>
+        Feedback
+        <textarea
+          rows="2"
+          [ngModel]="getFeedbackValue(task)"
+          (ngModelChange)="feedbackChange.emit({ taskId: task.taskId, value: $event })"
+        ></textarea>
+      </label>
+
+      <div class="actions">
+        <button class="outline" type="button" (click)="complete.emit(task.taskId)" [disabled]="task.userStatus === 'Completed'">
+          Complete my task
+        </button>
+        <button class="primary" type="button" (click)="saveFeedback.emit(task.taskId)">Save feedback</button>
+      </div>
+    </article>
+  </div>
+  <ng-template #noMyTasks><p class="message">No assigned tasks for this account yet.</p></ng-template>
+</section>

@@ -1,83 +1,53 @@
-<div class="container">
-  <h1>Task Management</h1>
-  <p>Track tasks, update progress, and filter by status or assignee.</p>
-
-  <div class="card">
-    <h2>Create Task</h2>
-    <form (ngSubmit)="submitTask()">
-      <div class="form-grid">
-        <div>
-          <label>Title</label>
-          <input type="text" [(ngModel)]="form.title" name="title" placeholder="Enter task title" required />
-        </div>
-        <div>
-          <label>Status</label>
-          <select [(ngModel)]="form.status" name="status">
-            <option value="Pending">Pending</option>
-            <option value="InProgress">In Progress</option>
-            <option value="Completed">Completed</option>
-          </select>
-        </div>
-        <div>
-          <label>Due Date</label>
-          <input type="date" [(ngModel)]="form.dueDate" name="dueDate" />
-        </div>
-        <div>
-          <label>Assigned User ID</label>
-          <input type="text" [(ngModel)]="form.assignedToUserId" name="assignedToUserId" placeholder="Optional user id" />
-        </div>
-      </div>
-      <div style="margin-top: 16px;">
-        <label>Description</label>
-        <textarea rows="3" [(ngModel)]="form.description" name="description" placeholder="Optional description"></textarea>
-      </div>
-
-      <div style="margin-top: 16px; display: flex; gap: 12px; align-items: center;">
-        <button class="primary" type="submit">Add Task</button>
-        <button class="ghost" type="button" (click)="loadTasks()">Refresh</button>
-      </div>
-      <div *ngIf="errorMessage()" class="error">{{ errorMessage() }}</div>
-    </form>
-  </div>
-
-  <div class="card" style="margin-top: 24px;">
-    <h2>Task List</h2>
-    <div class="form-grid">
-      <div>
-        <label>Status Filter</label>
-        <select [(ngModel)]="filterStatus" name="filterStatus">
-          <option value="All">All</option>
-          <option value="Pending">Pending</option>
-          <option value="InProgress">In Progress</option>
-          <option value="Completed">Completed</option>
-        </select>
-      </div>
-      <div>
-        <label>Assignee Filter</label>
-        <input type="text" [(ngModel)]="filterAssignee" name="filterAssignee" placeholder="Filter by user id" />
-      </div>
+<div class="page-shell">
+  <header class="hero">
+    <div>
+      <p class="eyebrow">Task Management System</p>
+      <h1>Role-based dashboard</h1>
+      <p class="subtext">
+        SuperAdmin can delete tasks, Admin can manage tasks, and Users can complete assigned work and feedback.
+      </p>
     </div>
-
-    <div class="task-list">
-      <div *ngFor="let task of filteredTasks()" class="task-row">
-        <div>
-          <div style="display: flex; gap: 12px; align-items: center;">
-            <strong>{{ task.title }}</strong>
-            <span class="badge">{{ task.status }}</span>
-          </div>
-          <div class="task-meta">Created {{ task.createdDate | date: 'medium' }}</div>
-          <div class="task-meta" *ngIf="task.dueDate">Due {{ task.dueDate | date: 'mediumDate' }}</div>
-          <div class="task-meta" *ngIf="task.assignedToUserId">Assigned to {{ task.assignedToUserId }}</div>
-          <p *ngIf="task.description">{{ task.description }}</p>
-        </div>
-        <div style="display: flex; flex-direction: column; gap: 8px;">
-          <button class="ghost" type="button" (click)="markCompleted(task)" [disabled]="task.status === 'Completed'">
-            Mark Completed
-          </button>
-          <button class="ghost" type="button" (click)="deleteTask(task)">Delete</button>
-        </div>
-      </div>
-      <div *ngIf="filteredTasks().length === 0" class="task-meta">No tasks match the current filters.</div>
+    <div class="header-actions" *ngIf="isAuthenticated">
+      <span class="chip">{{ username }} · {{ roles.join(', ') }}</span>
+      <button class="outline" type="button" (click)="logout()">Logout</button>
     </div>
-  </div>
+  </header>
+
+  <app-auth-panel
+    *ngIf="!isAuthenticated"
+    [authMode]="authMode"
+    [form]="authForm"
+    [message]="authMessage"
+    (modeChange)="setMode($event)"
+    (submitForm)="submitAuth()"
+  ></app-auth-panel>
+
+  <ng-container *ngIf="isAuthenticated">
+    <app-admin-tasks-panel
+      *ngIf="canManageTasks"
+      [canDeleteTask]="canDeleteTask"
+      [form]="taskForm"
+      [assignedUsersInput]="assignedUsersInput"
+      (assignedUsersInputChange)="assignedUsersInput = $event"
+      [searchTitle]="searchTitle"
+      (searchTitleChange)="searchTitle = $event"
+      [tasks]="tasks"
+      [message]="taskMessage"
+      (create)="createTask()"
+      (refresh)="loadTasks()"
+      (search)="searchTasks()"
+      (complete)="markCompleted($event)"
+      (delete)="deleteTask($event)"
+    ></app-admin-tasks-panel>
+
+    <app-user-tasks-panel
+      [tasks]="myTasks"
+      [feedbackDrafts]="feedbackDrafts"
+      (complete)="completeMyTask($event)"
+      (feedbackChange)="updateFeedbackDraft($event.taskId, $event.value)"
+      (saveFeedback)="saveMyFeedback($event)"
+    ></app-user-tasks-panel>
+
+    <p class="message panel" *ngIf="taskMessage && !canManageTasks">{{ taskMessage }}</p>
+  </ng-container>
 </div>
