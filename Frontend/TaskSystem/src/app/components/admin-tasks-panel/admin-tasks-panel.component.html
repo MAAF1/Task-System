@@ -1,0 +1,97 @@
+<section class="panel">
+  <div class="panel-heading">
+    <h2>{{ canDeleteTask ? 'SuperAdmin Task Controls' : 'Admin Task Controls' }}</h2>
+    <button class="outline" type="button" (click)="refresh.emit()">Refresh</button>
+  </div>
+
+  <form class="task-grid" (ngSubmit)="create.emit()">
+    <label>
+      Title
+      <input type="text" name="title" [(ngModel)]="form.title" maxlength="100" required />
+    </label>
+
+    <label>
+      Status
+      <select name="status" [(ngModel)]="form.status">
+        <option value="Pending">Pending</option>
+        <option value="InProgress">In Progress</option>
+        <option value="Completed">Completed</option>
+      </select>
+    </label>
+
+    <label>
+      Due Date
+      <input type="datetime-local" name="dueDate" [(ngModel)]="form.dueDate" />
+    </label>
+
+    <label>
+      Assigned user IDs
+      <input
+        type="text"
+        name="assignedUsersInput"
+        [ngModel]="assignedUsersInput"
+        (ngModelChange)="assignedUsersInputChange.emit($event)"
+        placeholder="e.g. 3, 7, 12"
+      />
+    </label>
+
+    <label class="full">
+      Description
+      <textarea name="description" rows="3" [(ngModel)]="form.description"></textarea>
+    </label>
+
+    <button class="primary" type="submit">Create task</button>
+  </form>
+
+  <p class="message" *ngIf="message">{{ message }}</p>
+</section>
+
+<section class="panel">
+  <div class="panel-heading with-search">
+    <h2>All tasks</h2>
+    <div class="search-row">
+      <input
+        type="text"
+        [ngModel]="searchTitle"
+        (ngModelChange)="searchTitleChange.emit($event)"
+        name="searchTitle"
+        placeholder="Search by task title"
+        (keyup.enter)="search.emit()"
+      />
+      <button class="outline" type="button" (click)="search.emit()">Search</button>
+    </div>
+  </div>
+
+  <div class="task-list" *ngIf="tasks.length; else emptyTasks">
+    <article class="task-card" *ngFor="let task of tasks; trackBy: trackByTaskId">
+      <div class="task-head">
+        <h3>{{ task.title }}</h3>
+        <span class="chip">{{ task.status }}</span>
+      </div>
+
+      <p *ngIf="task.description">{{ task.description }}</p>
+
+      <div class="meta">
+        <span>Created: {{ task.createdDate | date: 'medium' }}</span>
+        <span *ngIf="task.dueDate">Due: {{ task.dueDate | date: 'medium' }}</span>
+        <span *ngIf="task.closedDate">Closed: {{ task.closedDate | date: 'medium' }}</span>
+      </div>
+
+      <div class="assignees" *ngIf="task.assignedUsers.length">
+        <strong>Assigned users:</strong>
+        <ul>
+          <li *ngFor="let assignee of task.assignedUsers">#{{ assignee.userId }} - {{ assignee.userName }} ({{ assignee.status }})</li>
+        </ul>
+      </div>
+
+      <div class="actions">
+        <button class="outline" type="button" (click)="complete.emit(task)" [disabled]="task.status === 'Completed'">
+          Mark completed
+        </button>
+        <button class="danger" type="button" *ngIf="canDeleteTask" (click)="delete.emit(task.taskId)">Delete</button>
+      </div>
+    </article>
+  </div>
+
+  <ng-template #emptyTasks><p class="message">No tasks loaded.</p></ng-template>
+</section>
