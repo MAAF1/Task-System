@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "nUFW8FiQIQZPf+c6/utFlrhBxIBVoFOwYIN1h9YcmZTWY118XwRmBN4ZYWkmiqWeAeTP5LQSED63PAOJ7dTdlw==",
+  "dgSpecHash": "IYiw8LwGhOVauuPUIsYrzQ09AhIYV916YSpPOqlw0dWKQ31ncUgkPwAFHh3iWPKIjVUZ0+27O2HkiSHr+X008g==",
   "success": true,
-  "projectFilePath": "D:\\TaskSystem\\Backend\\TaskManagementSystem\\TaskManagementSystem.API\\TaskManagement.API.csproj",
+  "projectFilePath": "D:\\Newfolder\\Task-System\\Backend\\TaskManagementSystem\\TaskManagementSystem.API\\TaskManagement.API.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Mabdulghani\\.nuget\\packages\\azure.core\\1.38.0\\azure.core.1.38.0.nupkg.sha512",
     "C:\\Users\\Mabdulghani\\.nuget\\packages\\azure.identity\\1.11.4\\azure.identity.1.11.4.nupkg.sha512",

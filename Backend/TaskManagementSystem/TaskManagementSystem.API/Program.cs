@@ -18,17 +18,6 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowFrontend",
-        policy =>
-        {
-            policy
-                .WithOrigins("http://localhost:4200")
-                .AllowAnyHeader()
-                .AllowAnyMethod();
-        });
-});
 
 
 
@@ -39,7 +28,7 @@ builder.Services.AddAuthentication(options =>
 }).AddJwtBearer(o =>
 {
     o.RequireHttpsMetadata = false;
-    o.SaveToken = false;
+    o.SaveToken = true;
     o.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuerSigningKey = true,
@@ -54,14 +43,13 @@ builder.Services.AddAuthentication(options =>
 });
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("_AllowAnyOriginPolicy",
-        builder =>
+    options.AddPolicy("AllowFrontend",
+        policy =>
         {
-            builder.WithOrigins().WithOrigins("http://localhost:4200");
-            builder.AllowAnyHeader();
-            builder.AllowAnyMethod();
-            builder.AllowCredentials();
-            builder.SetIsOriginAllowed((hosts) => true);
+            policy.WithOrigins("http://localhost:4200")
+                  .AllowAnyHeader()
+                  .AllowAnyMethod()
+                  .AllowCredentials(); // if sending cookies
         });
 
 });
@@ -113,8 +101,10 @@ using (var scope = app.Services.CreateScope())
     app.UseSwagger();
     app.UseSwaggerUI();
 //}
-app.UseHttpsRedirection();
+
 app.UseCors("AllowFrontend");
+app.UseHttpsRedirection();
+app.UseRouting();
 app.UseAuthentication();
 app.UseRouting();
 app.UseAuthorization();

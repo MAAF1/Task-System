@@ -4383,11 +4383,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\TaskSystem\\Backend\\TaskManagementSystem\\TaskManagementSystem.API\\TaskManagement.API.csproj",
+      "projectUniqueName": "D:\\Newfolder\\Task-System\\Backend\\TaskManagementSystem\\TaskManagementSystem.API\\TaskManagement.API.csproj",
       "projectName": "TaskManagement.API",
-      "projectPath": "D:\\TaskSystem\\Backend\\TaskManagementSystem\\TaskManagementSystem.API\\TaskManagement.API.csproj",
+      "projectPath": "D:\\Newfolder\\Task-System\\Backend\\TaskManagementSystem\\TaskManagementSystem.API\\TaskManagement.API.csproj",
       "packagesPath": "C:\\Users\\Mabdulghani\\.nuget\\packages\\",
-      "outputPath": "D:\\TaskSystem\\Backend\\TaskManagementSystem\\TaskManagementSystem.API\\obj\\",
+      "outputPath": "D:\\Newfolder\\Task-System\\Backend\\TaskManagementSystem\\TaskManagementSystem.API\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Mabdulghani\\AppData\\Roaming\\NuGet\\NuGet.Config",
