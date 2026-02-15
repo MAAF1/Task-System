@@ -1,0 +1,41 @@
+.task-detail-container {
+  background-color: #f8f9fa;
+  min-height: 100vh;
+  padding-bottom: 2rem;
+}
+
+.card {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+}
+
+.btn-group {
+  gap: 4px;
+}
+
+.btn-group button {
+  flex: 1;
+}
+
+.info-item {
+  padding: 12px 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.info-item:last-child {
+  border-bottom: none;
+}
+
+.assigned-users {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.progress {
+  border-radius: 4px;
+}
+
+textarea {
+  resize: vertical;
+}
