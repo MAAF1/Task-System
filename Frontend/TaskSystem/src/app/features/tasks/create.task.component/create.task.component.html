@@ -1,0 +1,85 @@
+<div class="container my-4">
+  <h2 class="mb-4">Create New Task</h2>
+
+  <!-- Error message -->
+  @if(error) {
+    <div class="alert alert-danger" role="alert">
+      {{ error }}
+    </div>
+  }
+
+  <form (ngSubmit)="createTask()" class="needs-validation" novalidate>
+    <!-- Title -->
+    <div class="mb-3">
+      <label class="form-label fw-bold">Title <span class="text-danger">*</span></label>
+      <input 
+        type="text" 
+        class="form-control form-control-lg" 
+        [(ngModel)]="task.Title" 
+        name="title"
+        placeholder="Enter task title"
+        required
+      />
+    </div>
+
+    <!-- Description -->
+    <div class="mb-3">
+      <label class="form-label fw-bold">Description</label>
+      <textarea 
+        class="form-control" 
+        [(ngModel)]="task.Description" 
+        name="description"
+        rows="3"
+        placeholder="Enter task description"
+      ></textarea>
+    </div>
+
+    <!-- Due Date -->
+    <div class="mb-3">
+      <label class="form-label fw-bold">Due Date</label>
+      <input 
+        type="date" 
+        class="form-control" 
+        [(ngModel)]="task.DueDate" 
+        name="dueDate"
+      />
+    </div>
+
+    <!-- Status -->
+    <div class="mb-3">
+      <label class="form-label fw-bold">Status</label>
+      <select 
+        class="form-select" 
+        [(ngModel)]="task.Status" 
+        name="status"
+      >
+        <option [ngValue]="0">Pending</option>
+        <option [ngValue]="1">In Progress</option>
+        <option [ngValue]="2">Completed</option>
+      </select>
+    </div>
+
+    <!-- Assigned Users -->
+    <div class="mb-3">
+      <label class="form-label fw-bold">Assign Users (IDs, comma-separated)</label>
+      <input 
+            type="text"
+            class="form-control"
+            [(ngModel)]="assignedUsersInput"
+            (ngModelChange)="updateAssignedUsers($event)"
+            name="assignedUsers"
+            placeholder="e.g., 1,2,3"
+    />
+    </div>
+
+    <!-- Submit button -->
+    <button type="submit" class="btn btn-primary btn-lg" [disabled]="loading">
+      @if(loading) {
+        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+        Creating...
+      } @else {
+        Create Task
+      }
+    </button>
+  </form>
+</div>

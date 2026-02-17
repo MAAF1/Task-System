@@ -29,7 +29,14 @@ namespace TaskManagement.API.Controllers
         [Authorize(Roles = "Admin, SuperAdmin")]
         public async Task<IActionResult> AddTask([FromBody] CreateTaskDto dto)
         {
+            var userIdClaim = User.Claims.Where(x => x.Type.Contains("nameidentifier")).FirstOrDefault().Value;
+
             
+            if (string.IsNullOrWhiteSpace(userIdClaim))
+                return Unauthorized("User ID claim not found in token");
+
+            if (!int.TryParse(userIdClaim, out int userId))
+                return BadRequest("Invalid User ID format");
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -40,6 +47,7 @@ namespace TaskManagement.API.Controllers
             if (dto.DueDate.HasValue && dto.DueDate.Value <= DateTime.UtcNow)
                 return BadRequest("Due date must be in the future");
 
+            var user = await _context.Users.FindAsync(userId);
             var task = new TaskItem
             {
                 Title = dto.Title,
@@ -47,6 +55,8 @@ namespace TaskManagement.API.Controllers
                 CreatedDate = DateTime.UtcNow,
                 Status = dto.Status ?? Status.Pending,
                 DueDate = dto.DueDate ?? null,
+                CreatedBy = user,
+                CreatedById = userId
                 
             };
 
@@ -84,21 +94,27 @@ namespace TaskManagement.API.Controllers
            var tasks = await _context.Tasks
             .Include(t => t.AssignedUsers)
             .ThenInclude(ut => ut.User)
+            .Include( t => t.CreatedBy)
             .Select(t => new TaskResponseDto
             {
                 TaskId = Convert.ToInt32(t.Id),
                  Title = t.Title,
                  Description = t.Description,
-                 Status = t.Status,
+                 TaskItemStatus = t.Status,
                  CreatedDate = t.CreatedDate,
                  DueDate = t.DueDate,
                 ClosedDate = t.ClosedDate,
+                CreatedBy = t.CreatedBy.UserName,
                  AssignedUsers = t.AssignedUsers.Select(ut => new UserTaskInfoDto
                  {
                      UserId = ut.User.Id,
                      UserName = ut.User.UserName,
-                     Status = ut.Status,
-                     Feedback =ut.Feedback
+                     UserStatus = ut.Status,
+                     Feedback =ut.Feedback,
+                     AssignedDate = ut.AssignedDate,
+                     UserClosedDate = ut.ClosedDate,
+                     UserDueDate = ut.DueDate
+                     
                  }).ToList()
             })
             .ToListAsync();
@@ -140,17 +156,64 @@ namespace TaskManagement.API.Controllers
                     TaskId = Convert.ToInt32(t.Id),
                     Title = t.Title,
                     Description = t.Description,
-                    Status = t.Status,
+                    TaskItemStatus = t.Status,
                     CreatedDate = t.CreatedDate,
                     DueDate = t.DueDate,
                     ClosedDate = t.ClosedDate,
+                     
 
                     AssignedUsers = t.AssignedUsers.Select(ut => new UserTaskInfoDto
                     {
                         UserId = ut.User.Id,
                         UserName = ut.User.UserName,
-                        Status = ut.Status,
-                        Feedback = ut.Feedback
+                        UserStatus = ut.Status,
+                        Feedback = ut.Feedback,
+                        AssignedDate = ut.AssignedDate,
+                        UserClosedDate = ut.ClosedDate,
+                        UserDueDate = ut.DueDate
+
+                    }).ToList()
+                })
+                .ToListAsync();
+
+            if (!tasks.Any())
+                return NotFound("No tasks found with the given title");
+
+            return Ok(tasks);
+        }
+
+
+        [HttpGet("getbyid/{id}")]
+        [Authorize(Roles = "SuperAdmin,Admin")]
+        public async Task<IActionResult> GetById( int id)
+        {
+            
+            var tasks = await _context.Tasks
+                 .Include(t => t.AssignedUsers)
+                    .ThenInclude(ut => ut.User)
+                    .Include(t => t.CreatedBy)
+                    .Where(t => t.Id == id)
+                .Select(t => new TaskResponseDto
+                {
+                    TaskId = Convert.ToInt32(t.Id),
+                    Title = t.Title,
+                    Description = t.Description,
+                    TaskItemStatus = t.Status,
+                    CreatedDate = t.CreatedDate,
+                    DueDate = t.DueDate,
+                    ClosedDate = t.ClosedDate,
+                    CreatedBy = t.CreatedBy.UserName,
+
+                    AssignedUsers = t.AssignedUsers.Select(ut => new UserTaskInfoDto
+                    {
+                        UserId = ut.User.Id,
+                        UserName = ut.User.UserName,
+                        UserStatus = ut.Status,
+                        Feedback = ut.Feedback,
+                        AssignedDate = ut.AssignedDate,
+                        UserClosedDate = ut.ClosedDate,
+                        UserDueDate = ut.DueDate
+
                     }).ToList()
                 })
                 .ToListAsync();
@@ -183,15 +246,15 @@ namespace TaskManagement.API.Controllers
             if (dto.Description != null)
                 task.Description = dto.Description;
 
-            if (dto.Status.HasValue)
+            if (dto.TaskItemStatus.HasValue)
             {
-                if (!Enum.IsDefined(typeof(Status), dto.Status.Value))
+                if (!Enum.IsDefined(typeof(Status), dto.TaskItemStatus.Value))
                     return BadRequest("Invalid status value");
 
-                task.Status = dto.Status.Value;
+                task.Status = dto.TaskItemStatus.Value;
 
                
-                if (dto.Status == Status.Completed)
+                if (dto.TaskItemStatus == Status.Completed)
                     task.ClosedDate = DateTime.UtcNow;
             }
 
@@ -210,7 +273,7 @@ namespace TaskManagement.API.Controllers
                 TaskId = Convert.ToInt32(task.Id),
                 Title = task.Title,
                 Description = task.Description,
-                Status = task.Status,
+                TaskItemStatus = task.Status,
                 CreatedDate = task.CreatedDate,
                 DueDate = task.DueDate,
                 ClosedDate = task.ClosedDate

@@ -1,0 +1,39 @@
+<div class="container my-4">
+
+  <h2 class="mb-4">Admin Dashboard</h2>
+
+  <!-- Loading spinner -->
+  @if(loading) {
+    <div class="text-center my-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+  }
+
+  <!-- Error message -->
+  @if(error) {
+    <div class="alert alert-danger" role="alert">
+      {{ error }}
+    </div>
+  }
+
+  <!-- Tasks cards -->
+  <div class="row row-cols-1 row-cols-md-3 g-4">
+    @for ( task of tasks; track task.taskId ) {
+      <div class="col">
+        <div class="card h-100 shadow-sm" 
+             (click)="authService.isSuperAdmin() ? openTask(task.taskId) : null"
+             style="cursor: pointer;">
+          <div class="card-body">
+            <h5 class="card-title">{{ task.title }}</h5>
+            <p class="card-text text-truncate">{{ task.description }}</p>
+          </div>
+          <div class="card-footer text-muted">
+            Created by: {{ task.createdBy }}
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</div>

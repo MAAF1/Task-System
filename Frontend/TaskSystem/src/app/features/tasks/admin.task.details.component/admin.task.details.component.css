@@ -1,0 +1,92 @@
+
+.container {
+    max-width: 900px; 
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+
+.card {
+    border-radius: 12px !important;
+    overflow: hidden;
+    margin-bottom: 2rem;
+    background: #ffffff;
+    transition: box-shadow 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08) !important;
+}
+
+.card-header {
+    border-bottom: 1px solid #f0f2f5 !important;
+}
+
+
+.form-control, .form-select {
+    border-radius: 8px;
+    padding: 0.6rem 1rem;
+    border: 1px solid #dce1e6;
+    transition: all 0.2s;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15);
+}
+
+
+.bg-light {
+    background-color: #f8f9fa !important;
+    border-color: #e9ecef;
+    cursor: not-allowed;
+    color: #6c757d;
+}
+
+
+.btn {
+    border-radius: 8px;
+    padding: 0.6rem 1.2rem;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.btn-success {
+    background-color: #28a745;
+    border: none;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+    transform: translateY(-1px);
+}
+
+
+.input-group .btn {
+    border-radius: 0 8px 8px 0;
+}
+
+.input-group .form-control {
+    border-radius: 8px 0 0 8px;
+}
+
+.list-group-item {
+    padding: 1rem 0;
+    border-color: #f1f3f5;
+}
+
+.badge.bg-info {
+    background-color: #e3f2fd !important;
+    color: #0d6efd;
+    font-weight: 600;
+    padding: 0.5em 1em;
+}
+
+input[type="date"] {
+    position: relative;
+}

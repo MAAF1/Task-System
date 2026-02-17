@@ -25,7 +25,7 @@ namespace TaskManagement.API.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "SuperAdmin")]
         public async Task<IActionResult> GetAllUsers()
         {
             var users = await _context.Users
@@ -41,7 +41,7 @@ namespace TaskManagement.API.Controllers
             return Ok(users);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, SuperAdmin")]
         [HttpGet("search")]
         public async Task<IActionResult> SearchUsers([FromQuery] string name)
         {
@@ -64,7 +64,7 @@ namespace TaskManagement.API.Controllers
 
             return Ok(users);
         }
-
+        [Authorize(Roles ="SuperAdmin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {

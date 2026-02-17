@@ -1,0 +1,215 @@
+<!--
+<div class="container my-4">
+
+  <h2 class="mb-4">Task Details</h2>
+
+  
+  @if(loading) {
+    <div class="text-center my-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+  }
+
+ 
+  @if(error) {
+    <div class="alert alert-danger" role="alert">
+      {{ error }}
+    </div>
+  }
+
+ 
+  @if(taskDetails) {
+    <div class="card shadow-sm mb-4">
+      <div class="card-body">
+
+        <div class="mb-3">
+          <label class="form-label fw-bold">Title</label>
+          <input type="text" class="form-control" [(ngModel)]="taskDetails.title">
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-bold">Description</label>
+          <textarea class="form-control" rows="3" [(ngModel)]="taskDetails.description"></textarea>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-bold">Created By</label>
+          <input type="text" class="form-control" [value]="taskDetails.createdBy" disabled>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-bold">Created Date</label>
+          <input type="text" class="form-control" [value]="taskDetails.createdDate | date:'medium'" disabled>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-bold">Due Date</label>
+          <input type="date" class="form-control" [(ngModel)]="taskDetails.dueDate">
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-bold">Closed Date</label>
+          <input type="text" class="form-control" [value]="taskDetails.closedDate | date:'medium'" disabled>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-bold">Status</label>
+          <select class="form-select" [(ngModel)]="taskDetails.taskItemStatus">
+            <option value="0">Pending</option>
+            <option value="1">In Progress</option>
+            <option value="2">Completed</option>
+          </select>
+        </div>
+
+        
+        <div class="mb-3">
+          <button class="btn btn-success me-2" (click)="updateTask()">Update Task</button>
+          <button class="btn btn-danger" (click)="deleteTask()">Delete Task</button>
+        </div>
+
+       
+        <div class="mb-3">
+          <h5>Assign / Remove Users</h5>
+
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <input type="number" class="form-control" placeholder="User ID to assign" [(ngModel)]="userIdToAssign">
+            <button class="btn btn-primary" (click)="assignUser()">Assign</button>
+          </div>
+
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <input type="number" class="form-control" placeholder="User ID to remove" [(ngModel)]="userIdToRemove">
+            <button class="btn btn-warning" (click)="removeUser()">Remove</button>
+          </div>
+
+          <h6>Currently Assigned Users:</h6>
+          <ul class="list-group">
+            @for(user of taskDetails.assignedUsers; track user) {
+              <li class="list-group-item">{{ user.userName }} (ID: {{ user.userId }})</li>
+            }
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  }
+</div>
+
+
+-->
+
+<div class="container my-4">
+  <h2 class="mb-4 text-primary">Task Details</h2>
+
+  @if (loading) {
+    <div class="text-center my-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="mt-2">Fetching task data...</p>
+    </div>
+  }
+
+  @if (error) {
+    <div class="alert alert-danger shadow-sm" role="alert">
+      <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ error }}
+    </div>
+  }
+
+  @if (taskDetails && !loading) {
+    <div class="card shadow border-0">
+      <div class="card-header bg-white py-3">
+        <h5 class="card-title mb-0 text-secondary">Edit Task Information</h5>
+      </div>
+      
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-12 mb-3">
+            <label class="form-label fw-bold">Task Title</label>
+            <input type="text" class="form-control" [(ngModel)]="taskDetails.title" placeholder="Enter task title">
+          </div>
+
+          <div class="col-md-12 mb-3">
+            <label class="form-label fw-bold">Description</label>
+            <textarea class="form-control" rows="3" [(ngModel)]="taskDetails.description" placeholder="Task details..."></textarea>
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-bold text-muted">Created By</label>
+            <input type="text" class="form-control bg-light" [value]="taskDetails.createdBy" disabled>
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-bold text-muted">Created Date</label>
+            <input type="text" class="form-control bg-light" [value]="taskDetails.createdDate | date:'medium'" disabled>
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-bold text-primary">Due Date</label>
+            <input type="date" class="form-control border-primary" [(ngModel)]="taskDetails.dueDate">
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-bold">Current Status</label>
+            <select class="form-select" [(ngModel)]="taskDetails.taskItemStatus">
+              <option [ngValue]="0">Pending</option>
+              <option [ngValue]="1">In Progress</option>
+              <option [ngValue]="2">Completed</option>
+            </select>
+          </div>
+        </div>
+
+        <hr class="my-4">
+
+        <div class="d-flex gap-2">
+          <button class="btn btn-success px-4" (click)="updateTask()">
+            <i class="bi bi-save me-1"></i> Save Changes
+          </button>
+          <button class="btn btn-outline-danger" (click)="deleteTask()">
+            <i class="bi bi-trash me-1"></i> Delete Task
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card shadow mt-4 border-0">
+      <div class="card-body">
+        <h5 class="mb-3 text-secondary">User Management</h5>
+        
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label small fw-bold">Assign New User (ID)</label>
+            <div class="input-group">
+              <input type="number" class="form-control" [(ngModel)]="userIdToAssign" placeholder="User ID">
+              <button class="btn btn-primary" (click)="assignUser()">Assign</button>
+            </div>
+          </div>
+          
+          <div class="col-md-6">
+            <label class="form-label small fw-bold text-danger">Remove User (ID)</label>
+            <div class="input-group">
+              <input type="number" class="form-control" [(ngModel)]="userIdToRemove" placeholder="User ID">
+              <button class="btn btn-warning" (click)="removeUser()">Remove</button>
+            </div>
+          </div>
+        </div>
+
+        <h6 class="mt-4 mb-2 small text-uppercase fw-bold text-muted">Assigned Team:</h6>
+        <ul class="list-group list-group-flush border-top">
+          @for (user of taskDetails.assignedUsers; track user.userId) {
+            <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+              <div>
+                <span class="fw-bold">{{ user.userName }}</span>
+                <small class="text-muted ms-2">(ID: {{ user.userId }})</small>
+              </div>
+              <span class="badge bg-info rounded-pill">Active</span>
+            </li>
+          } @empty {
+            <li class="list-group-item text-muted small px-0">No users assigned yet.</li>
+          }
+        </ul>
+      </div>
+    </div>
+  }
+</div>

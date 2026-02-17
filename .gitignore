@@ -1,0 +1,19 @@
+# Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build Folders
+bin/
+obj/
+
+# Node / Frontend
+node_modules/
+dist/
+*.log
+package-lock.json
+
+# Environment files
+environment*.ts

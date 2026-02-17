@@ -9,10 +9,11 @@ namespace TaskManagement.API.DTOs
         
         public string Title { get; set; } = null!;
         public string? Description { get; set; }
-        public Status Status { get; set; }
+        public Status TaskItemStatus { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime? DueDate { get; set; }
         public DateTime? ClosedDate { get; set; }
+        public string CreatedBy { get; set; }
 
         public List<UserTaskInfoDto> AssignedUsers { get; set; } = new();
     }
